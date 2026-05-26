@@ -1,0 +1,6 @@
+{
+  "name": "Block Blast",
+  "description": "A colorful, highly tactile block puzzle game featuring drag-and-drop grid mechanics, satisfying synthesized sound effects, combos, local/cloud leaderboards, and light/dark mode optimization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
