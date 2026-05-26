@@ -74,10 +74,37 @@ export default function App() {
   const [pointerPos, setPointerPos] = useState({ x: 0, y: 0 });
   const [previewCell, setPreviewCell] = useState<{ row: number; col: number } | null>(null);
   const [previewValid, setPreviewValid] = useState(false);
+  const [measuredCellWidth, setMeasuredCellWidth] = useState(48);
 
   // References for drag bounds calculation
   const boardRef = useRef<HTMLDivElement>(null);
   const activeDragRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically track exact grid tile cell size with high fidelity to prevent drag-drift
+  useEffect(() => {
+    if (!boardRef.current) return;
+    
+    const updateSize = () => {
+      const rect = boardRef.current?.getBoundingClientRect();
+      if (rect) {
+        // Precise size of individual cell in 8x8 layout (board grid column size)
+        setMeasuredCellWidth(rect.width / 8);
+      }
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(() => {
+      updateSize();
+    });
+    observer.observe(boardRef.current);
+
+    window.addEventListener("resize", updateSize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateSize);
+    };
+  }, []);
 
   // Setup user identifiers & restore high score on load
   useEffect(() => {
@@ -284,8 +311,9 @@ export default function App() {
     setDraggedIdx(pieceIndex);
     setPointerPos({ x: e.clientX, y: e.clientY });
 
-    // Lift offset so block stays clearly visible ABOVE finger target on mobile
-    const liftOffset = -65; // offset upward on Y axis in pixels
+    // Lift offset so block stays clearly visible ABOVE finger target on mobile, and doesn't hide behind the touch cursor or pointer.
+    const isTouch = e.pointerType === "touch";
+    const liftOffset = isTouch ? -100 : -85; // significant upward shift so blocks are fully visible and comfortable to drag
     setDragOffset({
       x: cursorOffsetX,
       y: cursorOffsetY - liftOffset,
@@ -576,9 +604,9 @@ export default function App() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-2 w-full max-w-lg mx-auto mt-4">
+      <main className="flex-1 flex flex-col items-center justify-center p-2 w-full max-w-[490px] mx-auto mt-4">
         {/* SKIN/THEME SELECTOR RAIL */}
-        <div className="w-full flex justify-center gap-2 mb-4 bg-slate-900/60 border border-slate-800 p-1.5 rounded-2xl max-w-md">
+        <div className="w-full flex justify-center gap-2 mb-4 bg-slate-900/60 border border-slate-800 p-1.5 rounded-2xl max-w-[490px]">
           {(["neon", "retro", "candy", "gem"] as ThemeType[]).map((t) => (
             <button
               key={t}
@@ -598,7 +626,7 @@ export default function App() {
         </div>
 
         {/* 8x8 CORE PLAY BOARD */}
-        <div className="relative w-full max-w-md aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl p-3 shadow-2xl overflow-hidden min-h-[300px]">
+        <div className="relative w-full max-w-[490px] aspect-square bg-slate-900 border-2 border-slate-800 rounded-3xl p-3 shadow-2xl overflow-hidden min-h-[300px]">
           {/* Subtle Grid Backdrop for aesthetic neon vibes */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.06)_0%,rgba(0,0,0,0)_70%)] pointer-events-none" />
 
@@ -723,7 +751,7 @@ export default function App() {
         </div>
 
         {/* BOTTOM DOCK PIECE OPTIONS (THREE STORAGE LANES) */}
-        <div className="w-full max-w-md bg-slate-900/40 p-3 rounded-3xl border border-slate-800/40 shadow-inner mt-4">
+        <div className="w-full max-w-[490px] bg-slate-900/40 p-3 rounded-3xl border border-slate-800/40 shadow-inner mt-4">
           <p className="text-[10px] text-center font-mono text-slate-500 mb-2.5 tracking-wider uppercase">
             Drag & place blocks onto the blast boards above
           </p>
@@ -803,29 +831,34 @@ export default function App() {
           style={{
             left: `${pointerPos.x - dragOffset.x}px`,
             top: `${pointerPos.y - dragOffset.y}px`,
-            // Set scale size equivalent to grid tile dimensions dynamically calculated
-            transform: "scale(1.25)",
-            opacity: 0.94,
+            opacity: 0.96,
           }}
         >
           <div
-            className="grid gap-[3px]"
+            className="grid gap-[2.5px]"
             style={{
               gridTemplateColumns: `repeat(${dockPieces[draggedIdx]!.shape[0].length}, minmax(0, 1fr))`,
-              width: `${dockPieces[draggedIdx]!.shape[0].length * 28}px`,
+              width: `${dockPieces[draggedIdx]!.shape[0].length * measuredCellWidth}px`,
             }}
           >
             {dockPieces[draggedIdx]!.shape.map((rowArr, rIdx) =>
-              rowArr.map((cellVal, cIdx) => (
-                <div
-                  key={`${rIdx}-${cIdx}`}
-                  className={`w-[26px] h-[26px] rounded-md border shadow-md ${
-                    cellVal === 1
-                      ? THEME_COLOR_MAP[theme][dockPieces[draggedIdx!]!.color] || "bg-cyan-500"
-                      : "bg-transparent border-0"
-                  }`}
-                />
-              ))
+              rowArr.map((cellVal, cIdx) => {
+                const skinColorClass = THEME_COLOR_MAP[theme][dockPieces[draggedIdx!]!.color] || "bg-cyan-500";
+                return (
+                  <div
+                    key={`${rIdx}-${cIdx}`}
+                    className={`rounded-lg border shadow-lg ${
+                      cellVal === 1
+                        ? `${skinColorClass} border-white/20 shadow-md`
+                        : "bg-transparent border-transparent"
+                    }`}
+                    style={{
+                      width: `${measuredCellWidth - 2}px`,
+                      height: `${measuredCellWidth - 2}px`,
+                    }}
+                  />
+                );
+              })
             )}
           </div>
         </div>

@@ -1,16 +1,23 @@
 import { BlockPiece, ThemeType } from "./types";
 
-// Raw coordinates mapping for various block shapes
-export const BLOCK_TEMPLATES = [
-  // 1x1 Dot
+export interface Template {
+  shape: number[][];
+  color: string;
+  difficulty: "easy" | "medium" | "hard";
+}
+
+// Coordinate configurations for modern, balanced block templates
+export const BLOCK_TEMPLATES: Template[] = [
+  // EASY: 1x1, 1x2, 1x3, small corners
   {
     shape: [[1]],
     color: "pink",
+    difficulty: "easy"
   },
-  // 1x2 Horizontal / Vertical
   {
     shape: [[1, 1]],
     color: "cyan",
+    difficulty: "easy"
   },
   {
     shape: [
@@ -18,11 +25,12 @@ export const BLOCK_TEMPLATES = [
       [1]
     ],
     color: "cyan",
+    difficulty: "easy"
   },
-  // 1x3 Horizontal / Vertical
   {
     shape: [[1, 1, 1]],
     color: "lime",
+    difficulty: "easy"
   },
   {
     shape: [
@@ -31,40 +39,34 @@ export const BLOCK_TEMPLATES = [
       [1]
     ],
     color: "lime",
-  },
-  // 1x4 Horizontal / Vertical
-  {
-    shape: [[1, 1, 1, 1]],
-    color: "orange",
+    difficulty: "easy"
   },
   {
     shape: [
-      [1],
-      [1],
-      [1],
-      [1]
+      [1, 1],
+      [1, 0]
     ],
-    color: "orange",
+    color: "blue",
+    difficulty: "easy"
   },
-  // 2x2 Square
+  {
+    shape: [
+      [1, 1],
+      [0, 1]
+    ],
+    color: "blue",
+    difficulty: "easy"
+  },
+
+  // MEDIUM: 2x2 squares, standard L-shapes, T-shapes, S/Z-shapes
   {
     shape: [
       [1, 1],
       [1, 1]
     ],
     color: "yellow",
+    difficulty: "medium"
   },
-  // 3x3 Gigantic Square (Advanced Difficulty)
-  {
-    shape: [
-      [1, 1, 1],
-      [1, 1, 1],
-      [1, 1, 1]
-    ],
-    color: "purple",
-    isHard: true,
-  },
-  // L-shapes
   {
     shape: [
       [1, 0],
@@ -72,6 +74,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -80,6 +83,7 @@ export const BLOCK_TEMPLATES = [
       [1, 0]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -88,6 +92,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -96,6 +101,7 @@ export const BLOCK_TEMPLATES = [
       [0, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -103,6 +109,7 @@ export const BLOCK_TEMPLATES = [
       [1, 0, 0]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -110,6 +117,7 @@ export const BLOCK_TEMPLATES = [
       [0, 0, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -117,6 +125,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -124,6 +133,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1, 1]
     ],
     color: "blue",
+    difficulty: "medium"
   },
   // T-Shapes
   {
@@ -132,6 +142,7 @@ export const BLOCK_TEMPLATES = [
       [0, 1, 0]
     ],
     color: "teal",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -139,6 +150,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1, 1]
     ],
     color: "teal",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -147,6 +159,7 @@ export const BLOCK_TEMPLATES = [
       [1, 0]
     ],
     color: "teal",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -155,14 +168,16 @@ export const BLOCK_TEMPLATES = [
       [0, 1]
     ],
     color: "teal",
+    difficulty: "medium"
   },
-  // Z-shapes & S-shapes
+  // Z/S-Shapes (tactical diagonal placement builders)
   {
     shape: [
       [1, 1, 0],
       [0, 1, 1]
     ],
     color: "rose",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -170,6 +185,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1, 0]
     ],
     color: "rose",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -178,6 +194,7 @@ export const BLOCK_TEMPLATES = [
       [0, 1]
     ],
     color: "rose",
+    difficulty: "medium"
   },
   {
     shape: [
@@ -186,16 +203,41 @@ export const BLOCK_TEMPLATES = [
       [1, 0]
     ],
     color: "rose",
+    difficulty: "medium"
   },
-  
-  // Custom Hard shapes for higher levels
+
+  // HARD / STRATEGIC: 1x4, big corners, U-shapes, giant squares
+  {
+    shape: [[1, 1, 1, 1]],
+    color: "orange",
+    difficulty: "hard"
+  },
+  {
+    shape: [
+      [1],
+      [1],
+      [1],
+      [1]
+    ],
+    color: "orange",
+    difficulty: "hard"
+  },
+  {
+    shape: [
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 1]
+    ],
+    color: "purple",
+    difficulty: "hard"
+  },
   {
     shape: [
       [1, 1, 1],
       [1, 0, 1]
     ],
     color: "violet",
-    isHard: true,
+    difficulty: "hard"
   },
   {
     shape: [
@@ -204,7 +246,7 @@ export const BLOCK_TEMPLATES = [
       [1, 1]
     ],
     color: "violet",
-    isHard: true,
+    difficulty: "hard"
   },
   {
     shape: [
@@ -213,7 +255,7 @@ export const BLOCK_TEMPLATES = [
       [0, 1, 0]
     ],
     color: "amber",
-    isHard: true,
+    difficulty: "hard"
   }
 ];
 
@@ -281,41 +323,61 @@ export const THEME_BG_CLASSES: Record<ThemeType, string> = {
   gem: "bg-indigo-950 border-indigo-900 text-indigo-50"
 };
 
-// Generates a brand new unique board piece based on current game level (difficulty scale)
-export function getRandomPiece(level: number): BlockPiece {
-  // Higher level -> higher chance of selecting hard shapes
-  const hardShapeChance = Math.min(0.05 + level * 0.04, 0.45); // up to 45% chance
-  const filterHard = Math.random() < hardShapeChance;
-
-  let candidates = BLOCK_TEMPLATES.filter((template) => {
-    if (filterHard) return true; // Can choose any, including hard
-    return !template.isHard; // Filter out hard ones on easy/early levels
-  });
-
-  // Fallback in case list is empty
-  if (candidates.length === 0) {
-    candidates = BLOCK_TEMPLATES.filter((t) => !t.isHard);
-  }
-
-  const selectedTemplate = candidates[Math.floor(Math.random() * candidates.length)];
-  const shape = selectedTemplate.shape;
+// Helper to convert template to typed block piece
+function makePiece(selected: Template): BlockPiece {
+  const shape = selected.shape;
   const height = shape.length;
   const width = shape[0].length;
-
   return {
     id: `piece_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`,
     shape,
-    color: selectedTemplate.color,
-    skinColor: "", // dynamically bound during rendering by active theme
+    color: selected.color,
+    skinColor: "",
     width,
-    height,
+    height
   };
 }
 
+// Smart, progressive generator that provides high strategic agency
 export function generateDockPieces(level: number): BlockPiece[] {
-  return [
-    getRandomPiece(level),
-    getRandomPiece(level),
-    getRandomPiece(level)
-  ];
+  const easies = BLOCK_TEMPLATES.filter((t) => t.difficulty === "easy");
+  const mediums = BLOCK_TEMPLATES.filter((t) => t.difficulty === "medium");
+  const hards = BLOCK_TEMPLATES.filter((t) => t.difficulty === "hard");
+
+  // Selection profiles based on level to scale gameplay smoothly
+  let selection: Template[] = [];
+
+  if (level <= 2) {
+    // Early game: 2 Easies (enables combo setups) and 1 Medium template
+    const easy1 = easies[Math.floor(Math.random() * easies.length)];
+    const easy2 = easies[Math.floor(Math.random() * easies.length)];
+    const medium1 = mediums[Math.floor(Math.random() * mediums.length)];
+    selection = [easy1, easy2, medium1];
+  } else if (level <= 5) {
+    // Mid game balance: 1 Easy (tactical escape/snug helper), 1 Medium, 1 Hard
+    const easy1 = easies[Math.floor(Math.random() * easies.length)];
+    const medium1 = mediums[Math.floor(Math.random() * mediums.length)];
+    const hard1 = hards[Math.floor(Math.random() * hards.length)];
+    selection = [easy1, medium1, hard1];
+  } else {
+    // High difficulty: 1 Easy, 2 Medium/Hard mix
+    const easy1 = easies[Math.floor(Math.random() * easies.length)];
+    const roll1 = Math.random() < 0.4 ? mediums : hards;
+    const item1 = roll1[Math.floor(Math.random() * roll1.length)];
+    const roll2 = Math.random() < 0.3 ? mediums : hards;
+    const item2 = roll2[Math.floor(Math.random() * roll2.length)];
+    selection = [easy1, item1, item2];
+  }
+
+  // Shuffle pieces so they don't always appear in the same docket positions
+  const shuffled = [...selection].sort(() => Math.random() - 0.5);
+
+  return shuffled.map(makePiece);
+}
+
+// Fallback random retriever
+export function getRandomPiece(level: number): BlockPiece {
+  const templates = BLOCK_TEMPLATES;
+  const idx = Math.floor(Math.random() * templates.length);
+  return makePiece(templates[idx]);
 }
